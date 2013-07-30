@@ -27,7 +27,7 @@
     (let ((error-buffer (current-buffer)))
       (with-temp-buffer
         (insert perl-cmd)
-        (shell-command-on-region (point-min) (point-max) "perl" output-buffer nil error-buffer nil)))))
+        (call-process-region (point-min) (point-max) "perl" nil output-buffer)))))
 
 (defun hff/perl-cmd-to-string ( perl-cmd )
   ""
@@ -41,12 +41,12 @@
   (interactive)
   (concat (s-join "/" (split-string library-name "::" t)) ".pm" ))
 
-(defun hff/perl-cmd-for-getting-path-to-library-name ( library-name )
+(defun hff/insert-perl-cmd-for-getting-path-to-library-name ( library-name )
   ""
   (interactive)
   (concat "use " library-name "; print $INC{\"" (hff/perl-filename-for-library-name library-name) "\"};"))
 
-(defun hff/find-perl-library-file-using-shell-command-on-region ( library-name )
+(defun hff/find-perl-library-file-using-call-process-on-region ( library-name )
   "This defun does work on Windows, however when performed on a
 non-existing LIBRARY-NAME displays an error in the minibuffer."
   (interactive)
@@ -58,28 +58,12 @@ non-existing LIBRARY-NAME displays an error in the minibuffer."
           t)
       nil)))
 
-(defun hff/find-perl-library-file-using-call-process-shell-command ( library-name )
-  "This defun doesn't work on Windows due to some quoting issue I wasn't able to figure out."
-  (interactive)
-  (let* ((filename (concat (s-join "/" (split-string library-name "::" t)) ".pm" ))
-         (cmd (concat "perl -M" library-name " -e'print $INC{\"" filename "\"}'" )))
-      (with-temp-buffer
-        (call-process-shell-command cmd nil (current-buffer))
-        (let ((absolute-filename (buffer-substring-no-properties (point-min) (point))))
-          (if (and absolute-filename
-                     (f-exists? absolute-filename))
-              (progn
-                (find-file absolute-filename)
-                t)
-            nil)))))
-
 (defun hff/find-file-use-at-point ()
   ""
   (interactive)
   (let ((library-name (thing-at-point 'symbol t)))
-    (when (library-name)
+    (when library-name
       (hff/find-perl-library-file-using-shell-command-on-region library-name))))
-)
 
 (defun hff/find-file-require-at-point ()
   "Figure out whether we're on a 'require' and if so, open the associated file."
