@@ -41,7 +41,7 @@
   (interactive)
   (concat (s-join "/" (split-string library-name "::" t)) ".pm" ))
 
-(defun hff/insert-perl-cmd-for-getting-path-to-library-name ( library-name )
+(defun hff/perl-cmd-for-getting-path-to-library-name ( library-name )
   ""
   (interactive)
   (concat "use " library-name "; print $INC{\"" (hff/perl-filename-for-library-name library-name) "\"};"))
@@ -63,7 +63,7 @@ non-existing LIBRARY-NAME displays an error in the minibuffer."
   (interactive)
   (let ((library-name (thing-at-point 'symbol t)))
     (when library-name
-      (hff/find-perl-library-file-using-shell-command-on-region library-name))))
+      (hff/find-perl-library-file-using-call-process-on-region library-name))))
 
 (defun hff/find-file-require-at-point ()
   "Figure out whether we're on a 'require' and if so, open the associated file."
