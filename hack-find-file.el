@@ -76,9 +76,9 @@ non-existing LIBRARY-NAME displays an error in the minibuffer."
 (defun hff/find-file-use-at-point ()
   ""
   (interactive)
-
-  ; perl -MList::Util -e'print $INC{"List/Util.pm"} . "\n"'
-  nil
+  (let ((library-name (thing-at-point 'symbol t)))
+    (when (library-name)
+      (hff/find-perl-library-file-using-shell-command-on-region library-name))))
 )
 
 (defun hff/find-file-require-at-point ()
